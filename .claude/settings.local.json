@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(./venv/Scripts/python.exe -m pip install --upgrade pip -q)",
+      "Bash(./venv/Scripts/python.exe -m pip install django python-decouple pillow -q)",
+      "Bash(./venv/Scripts/python.exe manage.py test accounts.tests.EmployeeDashboardContentTests.test_employee_dashboard_query_count accounts.tests.AdminDashboardContentTests.test_admin_dashboard_query_count -v 2)"
+    ]
+  }
+}

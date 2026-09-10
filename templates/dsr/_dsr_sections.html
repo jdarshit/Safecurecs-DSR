@@ -1,0 +1,86 @@
+<div class="card mb-3">
+    <div class="card-header fw-semibold">General Information</div>
+    <div class="card-body">
+        <dl class="row mb-0">
+            <dt class="col-sm-4">Visit Date</dt><dd class="col-sm-8">{{ object.visit_date }}</dd>
+            <dt class="col-sm-4">Employee</dt><dd class="col-sm-8">{{ object.employee.get_full_name }}</dd>
+            <dt class="col-sm-4">Purpose of Visit</dt><dd class="col-sm-8">{{ object.get_purpose_of_visit_display }}</dd>
+        </dl>
+    </div>
+</div>
+
+<div class="card mb-3">
+    <div class="card-header fw-semibold">Client Details</div>
+    <div class="card-body">
+        <dl class="row mb-0">
+            <dt class="col-sm-4">Client Name</dt><dd class="col-sm-8">{{ object.client_name }}</dd>
+            <dt class="col-sm-4">Company Name</dt><dd class="col-sm-8">{{ object.company_name }}</dd>
+            <dt class="col-sm-4">Contact Person</dt><dd class="col-sm-8">{{ object.contact_person }}</dd>
+            <dt class="col-sm-4">Contact Number</dt><dd class="col-sm-8">{{ object.contact_number }}</dd>
+            {% if object.client_email %}
+                <dt class="col-sm-4">Email</dt><dd class="col-sm-8">{{ object.client_email }}</dd>
+            {% endif %}
+        </dl>
+    </div>
+</div>
+
+<div class="card mb-3">
+    <div class="card-header fw-semibold">Project Details</div>
+    <div class="card-body">
+        <dl class="row mb-0">
+            <dt class="col-sm-4">Project Name</dt><dd class="col-sm-8">{{ object.project_name }}</dd>
+            <dt class="col-sm-4">Project Address</dt><dd class="col-sm-8">{{ object.project_address }}</dd>
+            <dt class="col-sm-4">Project Type</dt><dd class="col-sm-8">{{ object.get_project_type_display }}</dd>
+            <dt class="col-sm-4">Building Size</dt><dd class="col-sm-8">{{ object.get_building_size_display }}</dd>
+            {% if object.built_up_area %}
+                <dt class="col-sm-4">Built-up Area</dt><dd class="col-sm-8">{{ object.built_up_area }}</dd>
+            {% endif %}
+            <dt class="col-sm-4">Project Stage</dt><dd class="col-sm-8">{{ object.get_project_stage_display }}</dd>
+        </dl>
+        {% if object.google_maps_link %}
+            <a href="{{ object.google_maps_link }}" target="_blank" rel="noopener" class="btn btn-outline-primary btn-sm mt-2">Open in Maps</a>
+        {% endif %}
+
+        {% if project_photos %}
+            <hr>
+            <h2 class="h6">Project Photos</h2>
+            <div class="upload-thumb-grid">
+                {% for photo in project_photos %}
+                    <a href="{% url 'dsr:attachment_download' pk=photo.pk %}" target="_blank" rel="noopener">
+                        <img src="{% url 'dsr:attachment_download' pk=photo.pk %}" class="upload-thumb" alt="{{ photo.original_filename }}">
+                    </a>
+                {% endfor %}
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+<div class="card mb-3">
+    <div class="card-header fw-semibold">Visit Information</div>
+    <div class="card-body">
+        <dl class="row mb-0">
+            <dt class="col-sm-4">Work Done</dt><dd class="col-sm-8">{{ object.work_done|default:'-'|linebreaksbr }}</dd>
+            {% if object.remarks %}
+                <dt class="col-sm-4">Remarks</dt><dd class="col-sm-8">{{ object.remarks|linebreaksbr }}</dd>
+            {% endif %}
+            {% if object.next_followup_date %}
+                <dt class="col-sm-4">Next Follow-up</dt><dd class="col-sm-8">{{ object.next_followup_date }}</dd>
+            {% endif %}
+        </dl>
+    </div>
+</div>
+
+{% if other_attachments %}
+<div class="card mb-3">
+    <div class="card-header fw-semibold">Attachments</div>
+    <div class="card-body">
+        <ul class="list-group">
+            {% for att in other_attachments %}
+                <li class="list-group-item">
+                    <a href="{% url 'dsr:attachment_download' pk=att.pk %}" target="_blank" rel="noopener">{{ att.original_filename }}</a>
+                </li>
+            {% endfor %}
+        </ul>
+    </div>
+</div>
+{% endif %}

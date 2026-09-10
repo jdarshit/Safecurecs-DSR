@@ -1,0 +1,155 @@
+<html>
+<head>
+<style>
+    @page { size: A4; margin: 2cm 1.5cm; }
+    body { font-family: Helvetica, sans-serif; font-size: 10pt; color: #212529; }
+    h1 { color: #0d6efd; font-size: 18pt; margin-bottom: 0; }
+    .subtitle { margin-top: 2px; color: #555555; }
+    .status {
+        display: inline-block;
+        padding: 2px 10px;
+        border-radius: 3px;
+        color: #ffffff;
+        font-size: 10pt;
+    }
+    .status-draft { background-color: #6c757d; }
+    .status-submitted { background-color: #0d6efd; }
+    .status-approved { background-color: #198754; }
+    .status-rejected { background-color: #dc3545; }
+    .section-title {
+        background-color: #0d6efd;
+        color: #ffffff;
+        padding: 5px 8px;
+        font-size: 11pt;
+        margin-top: 14px;
+    }
+    table.fields { width: 100%; border-collapse: collapse; margin-bottom: 6px; }
+    table.fields td { padding: 3px 6px; vertical-align: top; font-size: 9pt; }
+    table.fields td.label { width: 22%; font-weight: bold; color: #495057; }
+    table.photo-grid { width: 100%; margin-top: 6px; }
+    table.photo-grid td { width: 50%; padding: 6px; text-align: center; }
+    table.photo-grid img { width: 220px; }
+    table.signature-table { width: 100%; margin-top: 50px; }
+    table.signature-table td {
+        width: 50%;
+        padding-top: 30px;
+        border-top: 1px solid #000000;
+        font-size: 9pt;
+    }
+    .footer-note { font-size: 7pt; color: #888888; margin-top: 20px; }
+    ul.attachment-list { font-size: 9pt; }
+</style>
+</head>
+<body>
+    <h1>Safecurecs Communication</h1>
+    <p class="subtitle">Daily Service Report</p>
+
+    <table class="fields">
+        <tr>
+            <td class="label">DSR Number</td><td>{{ dsr.dsr_number }}</td>
+            <td class="label">Status</td>
+            <td><span class="status status-{{ dsr.status|lower }}">{{ dsr.get_status_display }}</span></td>
+        </tr>
+    </table>
+
+    <div class="section-title">General Information</div>
+    <table class="fields">
+        <tr>
+            <td class="label">Visit Date</td><td>{{ dsr.visit_date|date:'d/m/Y' }}</td>
+            <td class="label">Employee</td><td>{{ dsr.employee.get_full_name }} ({{ dsr.employee.employee_id }})</td>
+        </tr>
+        <tr>
+            <td class="label">Department</td><td>{{ dsr.employee.department|default:'-' }}</td>
+            <td class="label">Purpose of Visit</td><td>{{ dsr.get_purpose_of_visit_display }}</td>
+        </tr>
+    </table>
+
+    <div class="section-title">Client Details</div>
+    <table class="fields">
+        <tr>
+            <td class="label">Client Name</td><td>{{ dsr.client_name }}</td>
+            <td class="label">Company</td><td>{{ dsr.company_name }}</td>
+        </tr>
+        <tr>
+            <td class="label">Contact Person</td><td>{{ dsr.contact_person }}</td>
+            <td class="label">Contact Number</td><td>{{ dsr.contact_number }}</td>
+        </tr>
+        {% if dsr.client_email %}
+            <tr><td class="label">Email</td><td colspan="3">{{ dsr.client_email }}</td></tr>
+        {% endif %}
+    </table>
+
+    <div class="section-title">Project Details</div>
+    <table class="fields">
+        <tr><td class="label">Project Name</td><td colspan="3">{{ dsr.project_name }}</td></tr>
+        <tr><td class="label">Project Address</td><td colspan="3">{{ dsr.project_address }}</td></tr>
+        <tr>
+            <td class="label">Project Type</td><td>{{ dsr.get_project_type_display }}</td>
+            <td class="label">Building Size</td><td>{{ dsr.get_building_size_display }}</td>
+        </tr>
+        <tr>
+            <td class="label">Project Stage</td><td>{{ dsr.get_project_stage_display }}</td>
+            <td class="label">Built-up Area</td><td>{{ dsr.built_up_area|default:'-' }}</td>
+        </tr>
+        {% if dsr.google_maps_link %}
+            <tr><td class="label">Google Maps</td><td colspan="3">{{ dsr.google_maps_link }}</td></tr>
+        {% endif %}
+    </table>
+
+    {% if photo_rows %}
+        <div class="section-title">Project Photos</div>
+        <table class="photo-grid">
+            {% for row in photo_rows %}
+                <tr>
+                    {% for photo in row %}
+                        <td><img src="{{ photo.file.url }}" alt="{{ photo.original_filename }}"></td>
+                    {% endfor %}
+                    {% if row|length == 1 %}<td></td>{% endif %}
+                </tr>
+            {% endfor %}
+        </table>
+    {% endif %}
+
+    <div class="section-title">Visit Information</div>
+    <table class="fields">
+        <tr><td class="label">Work Done</td><td colspan="3">{{ dsr.work_done|default:'-' }}</td></tr>
+        {% if dsr.remarks %}
+            <tr><td class="label">Remarks</td><td colspan="3">{{ dsr.remarks }}</td></tr>
+        {% endif %}
+        {% if dsr.next_followup_date %}
+            <tr><td class="label">Next Follow-up</td><td colspan="3">{{ dsr.next_followup_date|date:'d/m/Y' }}</td></tr>
+        {% endif %}
+    </table>
+
+    {% if other_attachments %}
+        <div class="section-title">Attachments</div>
+        <ul class="attachment-list">
+            {% for att in other_attachments %}<li>{{ att.original_filename }}</li>{% endfor %}
+        </ul>
+    {% endif %}
+
+    {% if dsr.admin_remarks or dsr.reviewed_by %}
+        <div class="section-title">Admin Review</div>
+        <table class="fields">
+            {% if dsr.reviewed_by %}
+                <tr>
+                    <td class="label">Reviewed By</td><td>{{ dsr.reviewed_by.get_full_name }}</td>
+                    <td class="label">Reviewed At</td><td>{{ dsr.reviewed_at|date:'d/m/Y H:i' }}</td>
+                </tr>
+            {% endif %}
+            {% if dsr.admin_remarks %}
+                <tr><td class="label">Admin Remarks</td><td colspan="3">{{ dsr.admin_remarks }}</td></tr>
+            {% endif %}
+        </table>
+    {% endif %}
+
+    <table class="signature-table">
+        <tr>
+            <td>Employee Signature</td>
+            <td>Reviewed By</td>
+        </tr>
+    </table>
+
+    <div class="footer-note">Generated on {{ generated_at|date:'d/m/Y H:i' }}</div>
+</body>
+</html>

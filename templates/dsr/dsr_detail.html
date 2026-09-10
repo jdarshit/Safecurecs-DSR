@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+{% load dsr_extras %}
+
+{% block title %}{{ object.dsr_number }} - Safecurecs DSR{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-start mb-3 flex-wrap gap-2">
+    <div>
+        <h1 class="h4 text-primary mb-1">{{ object.dsr_number }}</h1>
+        <span class="badge bg-{{ object.status|status_badge_class }}">{{ object.get_status_display }}</span>
+    </div>
+    <div class="d-flex gap-2">
+        {% if object.status == 'APPROVED' %}
+            <a href="{% url 'dsr:export_pdf' pk=object.pk %}" class="btn btn-outline-secondary">
+                <i class="bi bi-file-earmark-pdf"></i> Download PDF
+            </a>
+        {% endif %}
+        {% if can_edit %}
+            <a href="{% url 'dsr:edit' pk=object.pk %}" class="btn btn-primary">Edit</a>
+        {% endif %}
+    </div>
+</div>
+
+{% if object.status == 'REJECTED' and object.admin_remarks %}
+    <div class="alert alert-warning">
+        <strong>Rejected &mdash; Admin Remarks:</strong> {{ object.admin_remarks }}
+    </div>
+{% elif object.admin_remarks %}
+    <div class="alert alert-info">
+        <strong>Admin Remarks:</strong> {{ object.admin_remarks }}
+    </div>
+{% endif %}
+
+{% include 'dsr/_dsr_sections.html' %}
+{% endblock %}

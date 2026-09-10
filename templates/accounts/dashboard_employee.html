@@ -1,0 +1,54 @@
+{% extends 'base.html' %}
+
+{% block title %}Employee Dashboard - Safecurecs DSR{% endblock %}
+
+{% block content %}
+{% url 'dsr:my_reports' as my_reports_url %}
+
+<div class="d-flex justify-content-between align-items-start flex-wrap gap-2 mb-3">
+    <div>
+        <h1 class="h4 text-primary mb-1">Welcome, {{ user.first_name }}</h1>
+        <p class="text-muted mb-0">Here's a quick look at your reports.</p>
+    </div>
+    <a href="{% url 'dsr:create' %}" class="btn btn-primary btn-lg">
+        <i class="bi bi-plus-lg me-1"></i> Create New DSR
+    </a>
+</div>
+
+<div class="row row-cols-2 row-cols-md-5 g-3 mb-4">
+    <div class="col">{% include 'dsr/_stat_card.html' with label='Total Reports' count=stats.total url=my_reports_url icon='bi-clipboard-data' color='primary' %}</div>
+    <div class="col">{% include 'dsr/_stat_card.html' with label='Drafts' count=stats.draft url=my_reports_url|add:'?status=DRAFT' icon='bi-file-earmark-text' color='secondary' %}</div>
+    <div class="col">{% include 'dsr/_stat_card.html' with label='Submitted' count=stats.submitted url=my_reports_url|add:'?status=SUBMITTED' icon='bi-hourglass-split' color='primary' %}</div>
+    <div class="col">{% include 'dsr/_stat_card.html' with label='Approved' count=stats.approved url=my_reports_url|add:'?status=APPROVED' icon='bi-check-circle' color='success' %}</div>
+    <div class="col">{% include 'dsr/_stat_card.html' with label='Rejected' count=stats.rejected url=my_reports_url|add:'?status=REJECTED' icon='bi-x-circle' color='danger' %}</div>
+</div>
+
+{% if needs_attention %}
+    <div class="card mb-4">
+        <div class="card-header fw-semibold text-danger">
+            <i class="bi bi-exclamation-triangle me-1"></i> Needs Attention
+        </div>
+        <div class="card-body">
+            {% for dsr in needs_attention %}
+                {% include 'dsr/_dsr_card.html' with dsr=dsr show_remarks=True %}
+            {% endfor %}
+        </div>
+    </div>
+{% endif %}
+
+<div class="card">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <span class="fw-semibold">Recent Reports</span>
+        <a href="{{ my_reports_url }}" class="small">View all</a>
+    </div>
+    <div class="card-body">
+        {% if recent_reports %}
+            {% for dsr in recent_reports %}
+                {% include 'dsr/_dsr_card.html' with dsr=dsr %}
+            {% endfor %}
+        {% else %}
+            <p class="text-muted mb-0">No reports yet. Create your first DSR to get started.</p>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

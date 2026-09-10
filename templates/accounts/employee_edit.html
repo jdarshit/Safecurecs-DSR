@@ -1,0 +1,107 @@
+{% extends 'base.html' %}
+
+{% block title %}Edit {{ object.get_full_name }} - Safecurecs DSR{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+    <h1 class="h4 text-primary mb-0">Edit Employee</h1>
+    <a href="{% url 'accounts:employee_list' %}" class="btn btn-outline-secondary">Back to Employees</a>
+</div>
+
+<div class="card mb-3">
+    <div class="card-body py-2 small text-muted d-flex flex-wrap gap-3">
+        <div><strong>Employee ID:</strong> {{ object.employee_id }}</div>
+        <div><strong>Role:</strong> {{ object.get_role_display }}</div>
+    </div>
+</div>
+
+{% if form.non_field_errors %}
+    <div class="alert alert-danger">
+        {% for error in form.non_field_errors %}<div>{{ error }}</div>{% endfor %}
+    </div>
+{% endif %}
+
+<div class="card mb-3">
+    <div class="card-header fw-semibold">Employee Details</div>
+    <div class="card-body">
+        <form method="post" action="{% url 'accounts:employee_edit' pk=object.pk %}" novalidate>
+            {% csrf_token %}
+
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <label class="form-label" for="{{ form.first_name.id_for_label }}">First Name</label>
+                    {{ form.first_name }}
+                    {% for error in form.first_name.errors %}<div class="text-danger small mt-1">{{ error }}</div>{% endfor %}
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label" for="{{ form.last_name.id_for_label }}">Last Name</label>
+                    {{ form.last_name }}
+                    {% for error in form.last_name.errors %}<div class="text-danger small mt-1">{{ error }}</div>{% endfor %}
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label" for="{{ form.email.id_for_label }}">Email</label>
+                    {{ form.email }}
+                    {% for error in form.email.errors %}<div class="text-danger small mt-1">{{ error }}</div>{% endfor %}
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label" for="{{ form.mobile_number.id_for_label }}">Mobile Number</label>
+                    {{ form.mobile_number }}
+                    {% for error in form.mobile_number.errors %}<div class="text-danger small mt-1">{{ error }}</div>{% endfor %}
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label" for="{{ form.department.id_for_label }}">Department</label>
+                    {{ form.department }}
+                    {% for error in form.department.errors %}<div class="text-danger small mt-1">{{ error }}</div>{% endfor %}
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label" for="{{ form.designation.id_for_label }}">Designation</label>
+                    {{ form.designation }}
+                    {% for error in form.designation.errors %}<div class="text-danger small mt-1">{{ error }}</div>{% endfor %}
+                </div>
+                <div class="col-12">
+                    <div class="form-check">
+                        {{ form.is_active }}
+                        <label class="form-check-label" for="{{ form.is_active.id_for_label }}">{{ form.is_active.label }}</label>
+                    </div>
+                    {% for error in form.is_active.errors %}<div class="text-danger small mt-1">{{ error }}</div>{% endfor %}
+                </div>
+            </div>
+
+            <button type="submit" class="btn btn-primary mt-3">Save Changes</button>
+        </form>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-header fw-semibold">Reset Password</div>
+    <div class="card-body">
+        <p class="text-muted small">
+            Sets a new password for this employee immediately - there is no email/OTP reset flow.
+        </p>
+
+        {% if reset_password_form.errors %}
+            <div class="alert alert-danger">
+                {% for field in reset_password_form %}
+                    {% for error in field.errors %}<div>{{ error }}</div>{% endfor %}
+                {% endfor %}
+            </div>
+        {% endif %}
+
+        <form method="post" action="{% url 'accounts:employee_reset_password' pk=object.pk %}"
+              onsubmit="return confirm('Reset the password for {{ object.get_full_name }}?');">
+            {% csrf_token %}
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <label class="form-label" for="{{ reset_password_form.new_password1.id_for_label }}">New Password</label>
+                    {{ reset_password_form.new_password1 }}
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label" for="{{ reset_password_form.new_password2.id_for_label }}">Confirm New Password</label>
+                    {{ reset_password_form.new_password2 }}
+                </div>
+            </div>
+            <button type="submit" class="btn btn-warning mt-3">Reset Password</button>
+        </form>
+    </div>
+</div>
+{% endblock %}

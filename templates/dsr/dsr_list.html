@@ -1,0 +1,94 @@
+{% extends 'base.html' %}
+{% load dsr_extras %}
+
+{% block title %}My Reports - Safecurecs DSR{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+    <h1 class="h4 text-primary mb-0">My Reports</h1>
+    <a href="{% url 'dsr:create' %}" class="btn btn-primary">New DSR</a>
+</div>
+
+<div class="card mb-3">
+    <div class="card-body">
+        <form method="get" class="row g-2 align-items-end">
+            <div class="col-6 col-md-3">
+                <label class="form-label small">Status</label>
+                {{ filter_form.status }}
+            </div>
+            <div class="col-6 col-md-3">
+                <label class="form-label small">From</label>
+                {{ filter_form.date_from }}
+            </div>
+            <div class="col-6 col-md-3">
+                <label class="form-label small">To</label>
+                {{ filter_form.date_to }}
+            </div>
+            <div class="col-6 col-md-3">
+                <label class="form-label small">Search</label>
+                {{ filter_form.q }}
+            </div>
+            <div class="col-12">
+                <button type="submit" class="btn btn-outline-primary">Apply Filters</button>
+                <a href="{% url 'dsr:my_reports' %}" class="btn btn-outline-secondary">Clear</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+{% if dsrs %}
+    <div class="d-md-none">
+        {% for dsr in dsrs %}
+            {% include 'dsr/_dsr_card.html' %}
+        {% endfor %}
+    </div>
+
+    <div class="d-none d-md-block card">
+        <table class="table mb-0 align-middle">
+            <thead>
+                <tr>
+                    <th>DSR Number</th>
+                    <th>Client</th>
+                    <th>Visit Date</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for dsr in dsrs %}
+                    <tr>
+                        <td><a href="{% url 'dsr:detail' pk=dsr.pk %}">{{ dsr.dsr_number }}</a></td>
+                        <td>{{ dsr.client_name }}</td>
+                        <td>{{ dsr.visit_date }}</td>
+                        <td><span class="badge bg-{{ dsr.status|status_badge_class }}">{{ dsr.get_status_display }}</span></td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    {% if is_paginated %}
+        <nav class="mt-3">
+            <ul class="pagination">
+                {% if page_obj.has_previous %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if querystring %}&{{ querystring }}{% endif %}">Previous</a>
+                    </li>
+                {% endif %}
+                <li class="page-item disabled">
+                    <span class="page-link">Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
+                </li>
+                {% if page_obj.has_next %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if querystring %}&{{ querystring }}{% endif %}">Next</a>
+                    </li>
+                {% endif %}
+            </ul>
+        </nav>
+    {% endif %}
+{% else %}
+    <div class="text-center py-5">
+        <p class="text-muted">No reports found.</p>
+        <a href="{% url 'dsr:create' %}" class="btn btn-primary">Create New DSR</a>
+    </div>
+{% endif %}
+{% endblock %}

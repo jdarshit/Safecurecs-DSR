@@ -1,0 +1,81 @@
+{% extends 'base.html' %}
+{% load dsr_extras %}
+
+{% block title %}Admin Dashboard - Safecurecs DSR{% endblock %}
+
+{% block content %}
+{% url 'dsr:all_reports' as all_reports_url %}
+
+<div class="d-flex justify-content-between align-items-start flex-wrap gap-2 mb-3">
+    <div>
+        <h1 class="h4 text-primary mb-1">Admin Dashboard</h1>
+        <p class="text-muted mb-0">Overview of all employee DSR activity.</p>
+    </div>
+    <a href="{{ all_reports_url }}" class="btn btn-primary">
+        <i class="bi bi-list-check me-1"></i> All Reports
+    </a>
+</div>
+
+<div class="row row-cols-2 row-cols-md-5 g-3 mb-2">
+    <div class="col">{% include 'dsr/_stat_card.html' with label='Pending Review' count=stats.submitted url=all_reports_url|add:'?status=SUBMITTED' icon='bi-hourglass-split' color='primary' emphasis=True %}</div>
+    <div class="col">{% include 'dsr/_stat_card.html' with label='Approved' count=stats.approved url=all_reports_url|add:'?status=APPROVED' icon='bi-check-circle' color='success' %}</div>
+    <div class="col">{% include 'dsr/_stat_card.html' with label='Rejected' count=stats.rejected url=all_reports_url|add:'?status=REJECTED' icon='bi-x-circle' color='danger' %}</div>
+    <div class="col">{% include 'dsr/_stat_card.html' with label='Total Reports' count=stats.total url=all_reports_url icon='bi-clipboard-data' color='dark' %}</div>
+    <div class="col">{% include 'dsr/_stat_card.html' with label='Active Employees' count=active_employee_count url='#' icon='bi-people' color='info' %}</div>
+</div>
+
+<div class="text-muted small mb-4">
+    Today &mdash; Submitted: {{ stats.submitted_today }} &middot; Approved: {{ stats.approved_today }} &middot; Rejected: {{ stats.rejected_today }}
+</div>
+
+<div class="row g-3">
+    <div class="col-lg-7">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <span class="fw-semibold">Pending Review Queue</span>
+                <a href="{{ all_reports_url }}?status=SUBMITTED" class="small">View all</a>
+            </div>
+            <div class="card-body p-0">
+                {% if pending_queue %}
+                    <div class="list-group list-group-flush">
+                        {% for dsr in pending_queue %}
+                            <a href="{% url 'dsr:review' pk=dsr.pk %}" class="list-group-item list-group-item-action dashboard-list-item">
+                                <div class="d-flex justify-content-between">
+                                    <strong>{{ dsr.dsr_number }}</strong>
+                                    <span class="text-muted small">Waiting {{ dsr.submitted_at|timesince }}</span>
+                                </div>
+                                <div class="small text-muted">{{ dsr.employee.get_full_name }} &middot; {{ dsr.client_name }} &middot; {{ dsr.visit_date }}</div>
+                            </a>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <p class="text-muted p-3 mb-0">No reports waiting for review.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-5">
+        <div class="card">
+            <div class="card-header fw-semibold">Recent Activity</div>
+            <div class="card-body p-0">
+                {% if recent_activity %}
+                    <div class="list-group list-group-flush">
+                        {% for dsr in recent_activity %}
+                            <a href="{% url 'dsr:review' pk=dsr.pk %}" class="list-group-item list-group-item-action dashboard-list-item">
+                                <div class="d-flex justify-content-between">
+                                    <strong>{{ dsr.dsr_number }}</strong>
+                                    <span class="badge bg-{{ dsr.status|status_badge_class }}">{{ dsr.get_status_display }}</span>
+                                </div>
+                                <div class="small text-muted">{{ dsr.employee.get_full_name }} &middot; {{ dsr.updated_at|timesince }} ago</div>
+                            </a>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <p class="text-muted p-3 mb-0">No activity yet.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

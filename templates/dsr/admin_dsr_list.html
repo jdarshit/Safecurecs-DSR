@@ -1,0 +1,154 @@
+{% extends 'base.html' %}
+{% load dsr_extras %}
+
+{% block title %}All Reports - Safecurecs DSR{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+    <h1 class="h4 text-primary mb-0">All Reports</h1>
+    <div class="d-flex gap-2">
+        {% if page_obj.paginator.count %}
+            <a href="{% url 'dsr:all_reports_export_excel' %}?{{ querystring }}" class="btn btn-outline-success">
+                <i class="bi bi-file-earmark-excel"></i> Export Excel
+            </a>
+            <a href="{% url 'dsr:all_reports_export_pdf' %}?{{ querystring }}" class="btn btn-outline-danger">
+                <i class="bi bi-file-earmark-pdf"></i> Export PDF
+            </a>
+        {% else %}
+            <button type="button" class="btn btn-outline-success disabled" disabled aria-disabled="true">
+                <i class="bi bi-file-earmark-excel"></i> Export Excel
+            </button>
+            <button type="button" class="btn btn-outline-danger disabled" disabled aria-disabled="true">
+                <i class="bi bi-file-earmark-pdf"></i> Export PDF
+            </button>
+        {% endif %}
+    </div>
+</div>
+
+<ul class="nav nav-pills mb-3 flex-wrap">
+    {% for tab in status_tabs %}
+        <li class="nav-item">
+            <a class="nav-link {% if tab.active %}active{% endif %}" href="?status={{ tab.value }}">
+                {{ tab.label }} <span class="badge {% if tab.active %}bg-light text-dark{% else %}bg-secondary{% endif %} ms-1">{{ tab.count }}</span>
+            </a>
+        </li>
+    {% endfor %}
+</ul>
+
+<div class="card mb-3">
+    <div class="card-body">
+        <form method="get" class="row g-2 align-items-end">
+            <div class="col-6 col-md-3">
+                <label class="form-label small">Employee</label>
+                {{ filter_form.employee }}
+            </div>
+            <div class="col-6 col-md-3">
+                <label class="form-label small">Client</label>
+                {{ filter_form.client }}
+            </div>
+            <div class="col-6 col-md-3">
+                <label class="form-label small">Project Type</label>
+                {{ filter_form.project_type }}
+            </div>
+            <div class="col-6 col-md-3">
+                <label class="form-label small">Status</label>
+                {{ filter_form.status }}
+            </div>
+            <div class="col-6 col-md-3">
+                <label class="form-label small">From</label>
+                {{ filter_form.date_from }}
+            </div>
+            <div class="col-6 col-md-3">
+                <label class="form-label small">To</label>
+                {{ filter_form.date_to }}
+            </div>
+            <div class="col-6 col-md-6">
+                <label class="form-label small">Search</label>
+                {{ filter_form.q }}
+            </div>
+            <div class="col-12">
+                <button type="submit" class="btn btn-outline-primary">Apply Filters</button>
+                <a href="{% url 'dsr:all_reports' %}" class="btn btn-outline-secondary">Clear</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+{% if dsrs %}
+    <div class="d-md-none">
+        {% for dsr in dsrs %}
+            <a href="{% url 'dsr:review' pk=dsr.pk %}" class="text-decoration-none text-reset d-block">
+                <div class="card mb-2">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between">
+                            <strong>{{ dsr.dsr_number }}</strong>
+                            <span class="badge bg-{{ dsr.status|status_badge_class }}">{{ dsr.get_status_display }}</span>
+                        </div>
+                        <div class="text-muted small">{{ dsr.employee.get_full_name }} &middot; {{ dsr.client_name }}</div>
+                        <div class="text-muted small">{{ dsr.visit_date }} &middot; {{ dsr.get_project_type_display }}</div>
+                    </div>
+                </div>
+            </a>
+        {% endfor %}
+    </div>
+
+    <div class="d-none d-md-block card">
+        <table class="table mb-0 align-middle">
+            <thead>
+                <tr>
+                    <th>DSR Number</th>
+                    <th>Employee</th>
+                    <th>Client</th>
+                    <th>Company</th>
+                    <th>Visit Date</th>
+                    <th>Project Type</th>
+                    <th>Status</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for dsr in dsrs %}
+                    <tr>
+                        <td>{{ dsr.dsr_number }}</td>
+                        <td>{{ dsr.employee.get_full_name }}</td>
+                        <td>{{ dsr.client_name }}</td>
+                        <td>{{ dsr.company_name }}</td>
+                        <td>{{ dsr.visit_date }}</td>
+                        <td>{{ dsr.get_project_type_display }}</td>
+                        <td><span class="badge bg-{{ dsr.status|status_badge_class }}">{{ dsr.get_status_display }}</span></td>
+                        <td>
+                            <a href="{% url 'dsr:review' pk=dsr.pk %}" class="btn btn-sm btn-outline-primary">
+                                {% if dsr.status == 'SUBMITTED' %}Review{% else %}View{% endif %}
+                            </a>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    {% if is_paginated %}
+        <nav class="mt-3">
+            <ul class="pagination">
+                {% if page_obj.has_previous %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if querystring %}&{{ querystring }}{% endif %}">Previous</a>
+                    </li>
+                {% endif %}
+                <li class="page-item disabled">
+                    <span class="page-link">Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
+                </li>
+                {% if page_obj.has_next %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if querystring %}&{{ querystring }}{% endif %}">Next</a>
+                    </li>
+                {% endif %}
+            </ul>
+        </nav>
+    {% endif %}
+{% else %}
+    <div class="text-center py-5">
+        <p class="text-muted">No reports found.</p>
+    </div>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,85 @@
+{% extends 'base.html' %}
+
+{% block title %}Add Employee - Safecurecs DSR{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+    <h1 class="h4 text-primary mb-0">Add Employee</h1>
+    <a href="{% url 'accounts:employee_list' %}" class="btn btn-outline-secondary">Back to Employees</a>
+</div>
+
+{% if form.non_field_errors %}
+    <div class="alert alert-danger">
+        {% for error in form.non_field_errors %}<div>{{ error }}</div>{% endfor %}
+    </div>
+{% endif %}
+
+<div class="card">
+    <div class="card-body">
+        <p class="text-muted small">
+            This form always creates an <strong>Employee</strong> account. Admin accounts are
+            created separately via <code>createsuperuser</code> or Django admin.
+        </p>
+
+        <form method="post" novalidate>
+            {% csrf_token %}
+
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <label class="form-label" for="{{ form.employee_id.id_for_label }}">Employee ID</label>
+                    {{ form.employee_id }}
+                    {% for error in form.employee_id.errors %}<div class="text-danger small mt-1">{{ error }}</div>{% endfor %}
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label" for="{{ form.email.id_for_label }}">Email</label>
+                    {{ form.email }}
+                    {% for error in form.email.errors %}<div class="text-danger small mt-1">{{ error }}</div>{% endfor %}
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label" for="{{ form.first_name.id_for_label }}">First Name</label>
+                    {{ form.first_name }}
+                    {% for error in form.first_name.errors %}<div class="text-danger small mt-1">{{ error }}</div>{% endfor %}
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label" for="{{ form.last_name.id_for_label }}">Last Name</label>
+                    {{ form.last_name }}
+                    {% for error in form.last_name.errors %}<div class="text-danger small mt-1">{{ error }}</div>{% endfor %}
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label" for="{{ form.mobile_number.id_for_label }}">Mobile Number (optional)</label>
+                    {{ form.mobile_number }}
+                    {% for error in form.mobile_number.errors %}<div class="text-danger small mt-1">{{ error }}</div>{% endfor %}
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label" for="{{ form.department.id_for_label }}">Department (optional)</label>
+                    {{ form.department }}
+                    {% for error in form.department.errors %}<div class="text-danger small mt-1">{{ error }}</div>{% endfor %}
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label" for="{{ form.designation.id_for_label }}">Designation (optional)</label>
+                    {{ form.designation }}
+                    {% for error in form.designation.errors %}<div class="text-danger small mt-1">{{ error }}</div>{% endfor %}
+                </div>
+            </div>
+
+            <hr class="my-4">
+
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <label class="form-label" for="{{ form.password1.id_for_label }}">Temporary Password</label>
+                    {{ form.password1 }}
+                    {% for error in form.password1.errors %}<div class="text-danger small mt-1">{{ error }}</div>{% endfor %}
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label" for="{{ form.password2.id_for_label }}">Confirm Password</label>
+                    {{ form.password2 }}
+                    {% for error in form.password2.errors %}<div class="text-danger small mt-1">{{ error }}</div>{% endfor %}
+                </div>
+            </div>
+            <p class="text-muted small mt-2">The employee should change this password after their first login.</p>
+
+            <button type="submit" class="btn btn-primary mt-3">Create Employee</button>
+        </form>
+    </div>
+</div>
+{% endblock %}

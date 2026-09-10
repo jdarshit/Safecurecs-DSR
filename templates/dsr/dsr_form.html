@@ -1,0 +1,220 @@
+{% extends 'base.html' %}
+{% load static dsr_extras %}
+
+{% block title %}{% if object %}Edit DSR{% else %}New DSR{% endif %} - Safecurecs DSR{% endblock %}
+
+{% block content %}
+<div class="dsr-form-page">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h1 class="h4 text-primary mb-0">{% if object %}Edit DSR{% else %}New DSR{% endif %}</h1>
+        <span class="badge bg-{{ object.status|default:'DRAFT'|status_badge_class }}">{{ object.get_status_display|default:'Draft' }}</span>
+    </div>
+
+    <div class="card mb-3">
+        <div class="card-body py-2 small text-muted d-flex flex-wrap gap-3">
+            <div><strong>DSR Number:</strong> {% if object %}{{ object.dsr_number }}{% else %}Will be generated on save{% endif %}</div>
+            <div><strong>Employee:</strong> {{ user.get_full_name }}</div>
+        </div>
+    </div>
+
+    {% if object.admin_remarks %}
+        {% if object.status == 'REJECTED' %}
+            <div class="alert alert-warning">
+                <strong>Rejected &mdash; Admin Remarks:</strong> {{ object.admin_remarks }}
+            </div>
+        {% else %}
+            <div class="alert alert-info">
+                <strong>Sent Back for Correction &mdash; Admin Remarks:</strong> {{ object.admin_remarks }}
+            </div>
+        {% endif %}
+    {% endif %}
+
+    {% if form.non_field_errors %}
+        <div class="alert alert-danger">
+            {% for error in form.non_field_errors %}<div>{{ error }}</div>{% endfor %}
+        </div>
+    {% endif %}
+
+    <form method="post" enctype="multipart/form-data" id="dsr-form" novalidate>
+        {% csrf_token %}
+
+        <div class="card mb-3">
+            <div class="card-header fw-semibold">General Information</div>
+            <div class="card-body">
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label class="form-label" for="{{ form.visit_date.id_for_label }}">Visit Date</label>
+                        {{ form.visit_date }}
+                        {% for error in form.visit_date.errors %}<div class="text-danger small mt-1">{{ error }}</div>{% endfor %}
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label" for="{{ form.purpose_of_visit.id_for_label }}">Purpose of Visit</label>
+                        {{ form.purpose_of_visit }}
+                        {% for error in form.purpose_of_visit.errors %}<div class="text-danger small mt-1">{{ error }}</div>{% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card mb-3">
+            <div class="card-header fw-semibold">Client Details</div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <label class="form-label" for="{{ form.client_name.id_for_label }}">Client Name</label>
+                    {{ form.client_name }}
+                    {% for error in form.client_name.errors %}<div class="text-danger small mt-1">{{ error }}</div>{% endfor %}
+                </div>
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label class="form-label" for="{{ form.company_name.id_for_label }}">Company Name</label>
+                        {{ form.company_name }}
+                        {% for error in form.company_name.errors %}<div class="text-danger small mt-1">{{ error }}</div>{% endfor %}
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label" for="{{ form.contact_person.id_for_label }}">Contact Person</label>
+                        {{ form.contact_person }}
+                        {% for error in form.contact_person.errors %}<div class="text-danger small mt-1">{{ error }}</div>{% endfor %}
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label" for="{{ form.contact_number.id_for_label }}">Contact Number</label>
+                        {{ form.contact_number }}
+                        {% for error in form.contact_number.errors %}<div class="text-danger small mt-1">{{ error }}</div>{% endfor %}
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label" for="{{ form.client_email.id_for_label }}">Email (optional)</label>
+                        {{ form.client_email }}
+                        {% for error in form.client_email.errors %}<div class="text-danger small mt-1">{{ error }}</div>{% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card mb-3">
+            <div class="card-header fw-semibold">Project Details</div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <label class="form-label" for="{{ form.project_name.id_for_label }}">Project Name</label>
+                    {{ form.project_name }}
+                    {% for error in form.project_name.errors %}<div class="text-danger small mt-1">{{ error }}</div>{% endfor %}
+                </div>
+                <div class="mb-3">
+                    <label class="form-label" for="{{ form.project_address.id_for_label }}">Project Address</label>
+                    {{ form.project_address }}
+                    {% for error in form.project_address.errors %}<div class="text-danger small mt-1">{{ error }}</div>{% endfor %}
+                </div>
+                <div class="mb-3">
+                    <label class="form-label" for="{{ form.google_maps_link.id_for_label }}">Google Maps Link (optional)</label>
+                    {{ form.google_maps_link }}
+                    {% for error in form.google_maps_link.errors %}<div class="text-danger small mt-1">{{ error }}</div>{% endfor %}
+                </div>
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label class="form-label" for="{{ form.project_type.id_for_label }}">Project Type</label>
+                        {{ form.project_type }}
+                        {% for error in form.project_type.errors %}<div class="text-danger small mt-1">{{ error }}</div>{% endfor %}
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label" for="{{ form.building_size.id_for_label }}">Building Size</label>
+                        {{ form.building_size }}
+                        {% for error in form.building_size.errors %}<div class="text-danger small mt-1">{{ error }}</div>{% endfor %}
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label" for="{{ form.built_up_area.id_for_label }}">Built-up Area (optional)</label>
+                        {{ form.built_up_area }}
+                        {% for error in form.built_up_area.errors %}<div class="text-danger small mt-1">{{ error }}</div>{% endfor %}
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label" for="{{ form.project_stage.id_for_label }}">Project Stage</label>
+                        {{ form.project_stage }}
+                        {% for error in form.project_stage.errors %}<div class="text-danger small mt-1">{{ error }}</div>{% endfor %}
+                    </div>
+                </div>
+
+                <hr>
+
+                <label class="form-label" for="id_project_photos">Project Photos</label>
+                <input type="file" name="project_photos" id="id_project_photos" class="form-control"
+                       accept="image/*" capture="environment" multiple
+                       data-max-size-mb="{{ max_attachment_size_mb }}">
+                <div class="form-text" id="project_photos_info"></div>
+
+                {% if project_photos %}
+                    <div class="upload-thumb-grid mt-2">
+                        {% for photo in project_photos %}
+                            <div class="upload-thumb-item">
+                                <a href="{% url 'dsr:attachment_download' pk=photo.pk %}" target="_blank" rel="noopener">
+                                    <img src="{% url 'dsr:attachment_download' pk=photo.pk %}" class="upload-thumb" alt="{{ photo.original_filename }}">
+                                </a>
+                                {% if can_edit %}
+                                    <form method="post" action="{% url 'dsr:attachment_delete' pk=object.pk attachment_pk=photo.pk %}"
+                                          class="upload-thumb-delete" onsubmit="return confirm('Remove this photo?');">
+                                        {% csrf_token %}
+                                        <button type="submit" class="btn btn-sm btn-outline-danger">&times;</button>
+                                    </form>
+                                {% endif %}
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="card mb-3">
+            <div class="card-header fw-semibold">Visit Information</div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <label class="form-label" for="{{ form.work_done.id_for_label }}">Work Done</label>
+                    {{ form.work_done }}
+                    {% for error in form.work_done.errors %}<div class="text-danger small mt-1">{{ error }}</div>{% endfor %}
+                </div>
+                <div class="mb-3">
+                    <label class="form-label" for="{{ form.remarks.id_for_label }}">Remarks (optional)</label>
+                    {{ form.remarks }}
+                    {% for error in form.remarks.errors %}<div class="text-danger small mt-1">{{ error }}</div>{% endfor %}
+                </div>
+                <div class="mb-3">
+                    <label class="form-label" for="{{ form.next_followup_date.id_for_label }}">Next Follow-up Date (optional)</label>
+                    {{ form.next_followup_date }}
+                    {% for error in form.next_followup_date.errors %}<div class="text-danger small mt-1">{{ error }}</div>{% endfor %}
+                </div>
+            </div>
+        </div>
+
+        <div class="card mb-3">
+            <div class="card-header fw-semibold">Attachments</div>
+            <div class="card-body">
+                <label class="form-label" for="id_attachments">Attachments (JPG, PNG, PDF)</label>
+                <input type="file" name="attachments" id="id_attachments" class="form-control"
+                       accept="image/*,.pdf" multiple data-max-size-mb="{{ max_attachment_size_mb }}">
+                <div class="form-text" id="attachments_info"></div>
+
+                {% if other_attachments %}
+                    <ul class="list-group mt-2">
+                        {% for att in other_attachments %}
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                <a href="{% url 'dsr:attachment_download' pk=att.pk %}" target="_blank" rel="noopener">{{ att.original_filename }}</a>
+                                {% if can_edit %}
+                                    <form method="post" action="{% url 'dsr:attachment_delete' pk=object.pk attachment_pk=att.pk %}"
+                                          onsubmit="return confirm('Remove this file?');">
+                                        {% csrf_token %}
+                                        <button type="submit" class="btn btn-sm btn-outline-danger">Remove</button>
+                                    </form>
+                                {% endif %}
+                            </li>
+                        {% endfor %}
+                    </ul>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="dsr-action-bar d-flex gap-2">
+            <button type="submit" name="action" value="save_draft" class="btn btn-outline-secondary flex-fill">Save Draft</button>
+            <button type="submit" name="action" value="submit" class="btn btn-primary flex-fill">Submit</button>
+        </div>
+    </form>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/dsr_form.js' %}"></script>
+{% endblock %}

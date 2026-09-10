@@ -1,0 +1,13 @@
+<a href="{{ url }}" class="text-decoration-none">
+    <div class="card stat-card h-100 border-{{ color }} {% if emphasis %}stat-card-emphasis{% endif %}">
+        <div class="card-body d-flex align-items-center gap-3">
+            <div class="stat-icon bg-{{ color }} bg-opacity-10 text-{{ color }}">
+                <i class="bi {{ icon }}"></i>
+            </div>
+            <div>
+                <div class="stat-count fw-bold text-dark">{{ count }}</div>
+                <div class="stat-label text-muted small">{{ label }}</div>
+            </div>
+        </div>
+    </div>
+</a>

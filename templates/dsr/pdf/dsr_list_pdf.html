@@ -1,0 +1,71 @@
+<html>
+<head>
+<style>
+    @page {
+        size: A4 landscape;
+        margin: 1.5cm;
+        @frame footer_frame {
+            -pdf-frame-content: footer_content;
+            bottom: 1cm;
+            margin-left: 1.5cm;
+            margin-right: 1.5cm;
+            height: 1cm;
+        }
+    }
+    body { font-family: Helvetica, sans-serif; font-size: 9pt; color: #212529; }
+    h1 { color: #0d6efd; font-size: 16pt; margin-bottom: 2px; }
+    .meta { font-size: 8pt; color: #555555; margin-bottom: 12px; }
+    table { width: 100%; border-collapse: collapse; }
+    th {
+        background-color: #0d6efd;
+        color: #ffffff;
+        padding: 5px;
+        text-align: left;
+        font-size: 8pt;
+    }
+    td { padding: 5px; border-bottom: 0.5px solid #cccccc; font-size: 8pt; }
+    .total { margin-top: 12px; font-weight: bold; }
+    #footer_content { font-size: 8pt; color: #555555; text-align: center; }
+</style>
+</head>
+<body>
+    <h1>Safecurecs Communication &mdash; DSR Report</h1>
+    <div class="meta">
+        Generated on: {{ generated_at|date:'d/m/Y H:i' }}<br>
+        {% if filters_summary %}Filters applied: {{ filters_summary }}{% else %}No filters applied{% endif %}
+    </div>
+
+    <table>
+        <thead>
+            <tr>
+                <th>DSR Number</th>
+                <th>Employee</th>
+                <th>Client</th>
+                <th>Company</th>
+                <th>Visit Date</th>
+                <th>Project Type</th>
+                <th>Status</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for dsr in dsrs %}
+                <tr>
+                    <td>{{ dsr.dsr_number }}</td>
+                    <td>{{ dsr.employee.get_full_name }}</td>
+                    <td>{{ dsr.client_name }}</td>
+                    <td>{{ dsr.company_name }}</td>
+                    <td>{{ dsr.visit_date|date:'d/m/Y' }}</td>
+                    <td>{{ dsr.get_project_type_display }}</td>
+                    <td>{{ dsr.get_status_display }}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <div class="total">Total Reports: {{ total_count }}</div>
+
+    <div id="footer_content">
+        Page <pdf:pagenumber /> of <pdf:pagecount />
+    </div>
+</body>
+</html>

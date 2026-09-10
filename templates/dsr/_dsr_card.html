@@ -1,0 +1,16 @@
+{% load dsr_extras %}
+<a href="{% url 'dsr:detail' pk=dsr.pk %}" class="text-decoration-none text-reset d-block">
+    <div class="card mb-2">
+        <div class="card-body">
+            <div class="d-flex justify-content-between">
+                <strong>{{ dsr.dsr_number }}</strong>
+                <span class="badge bg-{{ dsr.status|status_badge_class }}">{{ dsr.get_status_display }}</span>
+            </div>
+            <div class="text-muted small">{{ dsr.client_name }}</div>
+            <div class="text-muted small">{{ dsr.visit_date }}</div>
+            {% if show_remarks and dsr.admin_remarks %}
+                <div class="text-truncate small mt-1"><strong>Remarks:</strong> {{ dsr.admin_remarks }}</div>
+            {% endif %}
+        </div>
+    </div>
+</a>
