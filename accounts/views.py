@@ -5,6 +5,7 @@ from django.contrib.auth import get_user_model
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.views import LoginView, LogoutView, PasswordChangeView
 from django.db.models import Count, Q
+from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse, reverse_lazy
 from django.utils import timezone
@@ -21,6 +22,10 @@ from .mixins import AdminRequiredMixin, EmployeeRequiredMixin
 from .utils import get_dashboard_url
 
 User = get_user_model()
+
+
+def health_check(request):
+    return JsonResponse({'status': 'ok'})
 
 
 class IndexRedirectView(RedirectView):

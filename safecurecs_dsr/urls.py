@@ -19,7 +19,7 @@ from django.conf.urls.static import static
 from django.contrib import admin
 from django.urls import include, path
 
-from accounts.views import IndexRedirectView
+from accounts.views import IndexRedirectView, health_check
 
 admin.site.site_header = 'Safecurecs DSR Administration'
 admin.site.site_title = 'Safecurecs DSR Administration'
@@ -27,6 +27,7 @@ admin.site.index_title = 'Administration'
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('health/', health_check, name='health'),
     path('', IndexRedirectView.as_view(), name='home'),
     path('', include('accounts.urls')),
     path('dsr/', include('dsr.urls')),
