@@ -4,7 +4,7 @@ services:
     runtime: python
     plan: free
     buildCommand: pip install -r requirements.txt && python manage.py migrate && python manage.py collectstatic --noinput
-    startCommand: gunicorn safecurecs_dsr.wsgi:application
+    startCommand: python manage.py migrate && python manage.py ensure_admin && gunicorn safecurecs_dsr.wsgi:application
     healthCheckPath: /health/
     envVars:
       - key: SECRET_KEY
@@ -14,6 +14,16 @@ services:
       - key: ALLOWED_HOSTS
         sync: false
       - key: DATABASE_URL
+        sync: false
+      - key: BOOTSTRAP_ADMIN_ID
+        value: ADMIN001
+      - key: BOOTSTRAP_ADMIN_EMAIL
+        value: admin@safecurecs.com
+      - key: BOOTSTRAP_ADMIN_FIRST_NAME
+        value: Safecurecs
+      - key: BOOTSTRAP_ADMIN_LAST_NAME
+        value: Admin
+      - key: BOOTSTRAP_ADMIN_PASSWORD
         sync: false
       - key: SECURE_SSL_REDIRECT
         value: "True"
